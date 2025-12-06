@@ -1,10 +1,10 @@
 name: Build and Release Plugin
 
 on:
-  workflow_dispatch: # Allows manual button click
+  workflow_dispatch:
   push:
     tags:
-      - 'v*' # Triggers when you push a tag like v1.0.1
+      - 'v*'
 
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: 9.0.x
 
     - name: Restore dependencies
       run: dotnet restore ./ElegantAnnouncements/ElegantAnnouncements.csproj
