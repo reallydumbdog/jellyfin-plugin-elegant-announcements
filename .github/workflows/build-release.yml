@@ -1,0 +1,43 @@
+name: Build and Release Plugin
+
+on:
+  workflow_dispatch: # Allows manual button click
+  push:
+    tags:
+      - 'v*' # Triggers when you push a tag like v1.0.1
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore ./ElegantAnnouncements/ElegantAnnouncements.csproj
+
+    - name: Build
+      run: dotnet build ./ElegantAnnouncements/ElegantAnnouncements.csproj --configuration Release --no-restore
+
+    - name: Publish
+      run: dotnet publish ./ElegantAnnouncements/ElegantAnnouncements.csproj --configuration Release --no-build --output ./publish
+
+    - name: Zip Release
+      uses: TheDoctor0/zip-release@0.7.1
+      with:
+        type: 'zip'
+        filename: 'ElegantAnnouncements.zip'
+        directory: './publish'
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: ./publish/ElegantAnnouncements.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
